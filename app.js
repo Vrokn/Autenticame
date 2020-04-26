@@ -26,21 +26,19 @@ app.set('view engine', 'pug');
 app.set('views', './views');
 
 UsersSchema.statics.authenticate = async (email, password) => {
-  // buscamos el usuario utilizando el email
-  const user = await this.findOne({ email: email });
-  if (user) {
-    // si existe comparamos la contraseña
-    return new Promise((resolve, reject) => {
-      bcrypt.compare(password, user.password, (err, result) => {
-        if (err) reject(err);
-        resolve(result === true ? user : null);
+    const user = await mongoose.model("Users").findOne({ email: email });
+    if (user) {
+      new Promise((resolve, reject) => {
+        bcrypt.compare(password, user.password, (err, result) => {
+          if (err) reject(err);
+          resolve(result === true ? user : null);
+        });
+        return user;
       });
-    });
-    return user;
-  }
-  return null;
-};
-
+    }  
+    return null;
+  };
+  
 const requireUser = async (req, res, next) => {
     const userId = req.session.userId;
     if (userId) {

@@ -1,0 +1,28 @@
+doctype html
+head
+  title Formulario de Registro
+  link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
+  link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js')
+  script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js')
+  style.
+    .bs-example{
+    margin: 100px 300px;
+    }
+    body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    background-color: rgb(17, 17, 17);
+    color: rgb(216, 216, 216);
+    }
+
+.bs-example
+  form(method='get')
+    .form-group.row
+      label.col-sm-2.col-form-label(for='email') Email:
+      .col-sm-10
+        input#email.form-control(type='email' name='email' placeholder='Ingrese su Email' required='')
+    .form-group.row
+      .col-sm-10.offset-sm-2
+        button.btn.btn-primary(type='submit') Log out

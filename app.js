@@ -77,12 +77,14 @@ app.get("/login", (req, res) => { // GET /login - muestra el formulario de auten
   
 app.get("/logout", (req, res) => { //GET /logout - se utiliza para desautenticarse (si esa palabra existe).
     const email = req.body.email;
+    res.clearCookie("token");    
     Users.deleteOne({ email:email }, function(err) {
         if (err) return console.error(err);
       });
+    res.redirect("/login");
 });
 
-app.post("/login", async (req, res) => { //POST /login- autentica al usuario.
+app.post("/login", async (req, res, next) => { //POST /login- autentica al usuario.
     const email = req.body.email;
     const password = req.body.password;
   
@@ -95,7 +97,7 @@ app.post("/login", async (req, res) => { //POST /login- autentica al usuario.
         res.render("/login", { error: "Wrong email or password. Try again!" });
       }
     } catch (e) {
-      return (e);
+      return next(e);
     }
 });
   

@@ -12,32 +12,31 @@ const UsersSchema = new mongoose.Schema({
   email: { type: String },
   password: { type: String },
 });
+
+UsersSchema.statics.authenticate = async function (email, password) {
+  const user = await this.findOne({ email: email });
+  if (user) {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) reject(err);
+        resolve(result ? user : null);
+      });       
+    });
+  }  
+  return null;
+};
+
 const Users = mongoose.model("Users", UsersSchema);
 
 app.use(cookieSession({
     name: 'session',
-    keys: [0],
-  
+    keys: ['token'], 
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }))
+  }));
 app.use(express.urlencoded());
 app.set('view engine', 'pug');
 app.set('views', './views');
-
-UsersSchema.statics.authenticate = async (email, password) => {
-    const user = await mongoose.model("Users").findOne({ email: email });
-    if (user) {
-      new Promise((resolve, reject) => {
-        bcrypt.compare(password, user.password, (err, result) => {
-          if (err) reject(err);
-          resolve(result === true ? user : null);
-        });
-        return user;
-      });
-    }  
-    return null;
-  };
   
 const requireUser = async (req, res, next) => {
     const userId = req.session.userId;
@@ -63,7 +62,6 @@ app.post("/register", async (req, res) => { //POST /register - crea al usuario e
   const name = req.body.name;
   const email = req.body.email;
   const password = bcrypt.hashSync(req.body.password, 10);
-  console.log(req.body);
   const user = new Users({ name:name, email:email, password:password });
   await user.save();
   res.redirect('/');
@@ -74,18 +72,13 @@ app.get("/login", (req, res) => { // GET /login - muestra el formulario de auten
 });
   
 app.get("/logout", (req, res) => { //GET /logout - se utiliza para desautenticarse (si esa palabra existe).
-    const email = req.body.email;
-    res.clearCookie("token");    
-    Users.deleteOne({ email:email }, function(err) {
-        if (err) return console.error(err);
-      });
+    res.clearCookie("token");       
     res.redirect("/login");
 });
 
-app.post("/login", async (req, res, next) => { //POST /login- autentica al usuario.
+app.post("/login", async (req, res) => { //POST /login- autentica al usuario.
     const email = req.body.email;
-    const password = req.body.password;
-  
+    const password = req.body.password;  
     try {
       const user = await Users.authenticate(email, password);
       if (user) {
@@ -95,7 +88,7 @@ app.post("/login", async (req, res, next) => { //POST /login- autentica al usuar
         res.render("/login", { error: "Wrong email or password. Try again!" });
       }
     } catch (e) {
-      return next(e);
+      return res.status(500).send(e);
     }
 });
   

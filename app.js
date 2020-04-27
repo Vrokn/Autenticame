@@ -88,7 +88,7 @@ app.post("/login", async (req, res) => { //POST /login- autentica al usuario.
         res.render("/login", { error: "Wrong email or password. Try again!" });
       }
     } catch (e) {
-      return res.status(500).send(e);
+      return res.status(500).send(e); 
     }
 });
   
